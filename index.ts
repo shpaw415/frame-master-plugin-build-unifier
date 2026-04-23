@@ -219,9 +219,8 @@ export default function buildunifier(
 					await initSharedContext();
 				},
 				async afterBuild() {
-					if (isBuildMode()) {
-						await current_builder?.build();
-					}
+					if (!isBuildMode() || current_builder?.isBuilding()) return;
+					await current_builder?.build();
 				},
 			},
 		},
