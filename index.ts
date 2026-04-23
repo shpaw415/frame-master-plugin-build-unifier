@@ -211,8 +211,10 @@ export default function buildunifier(
 				frameMasterVersion: peerDependencies["frame-master"],
 				bunVersion: ">=1.3.10",
 			},
-			createContext() {
-				initSharedContext();
+			serverStart: {
+				async main() {
+					initSharedContext();
+				},
 			},
 			build: {
 				async beforeBuild() {
