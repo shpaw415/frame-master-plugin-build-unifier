@@ -1,6 +1,6 @@
+import { getGlobalPluginContext } from "frame-master/plugin";
 import type { FrameMasterConfig } from "frame-master/server/types";
 import BuildUnifier from "./";
-import { getGlobalPluginContext } from "frame-master/plugin";
 
 declare module "frame-master/plugin/types" {
 	interface GlobalPluginContextMap {

@@ -1,15 +1,15 @@
-import type {
-	FrameMasterPlugin,
-	BuildOptionsPlugin,
-	GlobalPluginContextMap,
-} from "frame-master/plugin/types";
-import { name, version, peerDependencies } from "./package.json";
 import { Builder } from "frame-master/build";
 import {
 	getGlobalPluginContext,
 	setGlobalPluginContext,
 } from "frame-master/plugin";
+import type {
+	BuildOptionsPlugin,
+	FrameMasterPlugin,
+	GlobalPluginContextMap,
+} from "frame-master/plugin/types";
 import { isBuildMode } from "frame-master/utils";
+import { name, peerDependencies, version } from "./package.json";
 
 declare module "frame-master/plugin/types" {
 	interface GlobalPluginContextMap {
@@ -216,11 +216,9 @@ export default function buildunifier(
 			},
 			build: {
 				async beforeBuild() {
+					if (!isBuildMode()) return;
 					await initSharedContext();
-				},
-				async afterBuild() {
-					if (!isBuildMode() || current_builder?.isBuilding()) return;
-					await current_builder?.build();
+					console.log(await current_builder?.build());
 				},
 			},
 		},
