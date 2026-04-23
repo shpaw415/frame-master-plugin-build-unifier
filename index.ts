@@ -169,13 +169,13 @@ export default function buildunifier(
 
 	let current_builder: Builder | null = null;
 
-	const initSharedContext = async () => {
+	const initSharedContext = () => {
 		const sharedContext = ensureBuildUnifierContext();
 		const configs = sharedContext.build_config?.[id] || [];
 		const resolver = sharedContext.builderResolvers?.get(id);
 
 		try {
-			const builder = await Builder.createBuilder({
+			const builder = new Builder({
 				afterBuilds: configs
 					.flatMap((config) => config.afterBuild)
 					.filter((config) => typeof config !== "undefined"),
@@ -211,14 +211,14 @@ export default function buildunifier(
 				frameMasterVersion: peerDependencies["frame-master"],
 				bunVersion: ">=1.3.10",
 			},
-			async serverReady() {
-				await initSharedContext();
+			createContext() {
+				initSharedContext();
 			},
 			build: {
 				async beforeBuild() {
 					if (!isBuildMode()) return;
-					await initSharedContext();
-					console.log(await current_builder?.build());
+					initSharedContext();
+					await current_builder?.build();
 				},
 			},
 		},

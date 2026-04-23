@@ -14,6 +14,9 @@ export default {
 	HTTPServer: {
 		port: 3000,
 	},
+	pluginsOptions: {
+		entrypoints: ["mock/index.ts"],
+	},
 	plugins: [
 		...BuildUnifier({
 			plugins: [
