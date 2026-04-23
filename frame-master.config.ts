@@ -22,6 +22,7 @@ export default {
 					version: "0.1.0",
 					createContext() {
 						const ctx = getGlobalPluginContext("build-unifier");
+
 						ctx?.setBuildConfig?.("build-1-1", {
 							beforeBuild() {
 								console.log("build-1-1 beforeBuild");

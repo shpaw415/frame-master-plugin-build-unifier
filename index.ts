@@ -9,6 +9,7 @@ import {
 	getGlobalPluginContext,
 	setGlobalPluginContext,
 } from "frame-master/plugin";
+import { isBuildMode } from "frame-master/utils";
 
 declare module "frame-master/plugin/types" {
 	interface GlobalPluginContextMap {
@@ -158,52 +159,71 @@ export default function buildunifier(
 	const index = ctx.index || 0;
 	const id = Bun.randomUUIDv7();
 	const pluginNames = props.plugins.map((p) => p.name);
-	const lowestPriority = Math.min(...props.plugins.map((p) => p.priority ?? 0));
+	const highestPriority = Math.max(
+		...props.plugins.map((p) => p.priority ?? 0),
+	);
 	ctx.index = index + 1;
 	registerPluginsForBuilder(id, pluginNames, ctx);
 
 	const current_name = index ? `${name}_${index}` : name;
 
+	let current_builder: Builder | null = null;
+
+	const initSharedContext = async () => {
+		const sharedContext = ensureBuildUnifierContext();
+		const configs = sharedContext.build_config?.[id] || [];
+		const resolver = sharedContext.builderResolvers?.get(id);
+
+		try {
+			const builder = await Builder.createBuilder({
+				afterBuilds: configs
+					.flatMap((config) => config.afterBuild)
+					.filter((config) => typeof config !== "undefined"),
+				beforeBuilds: configs
+					.flatMap((config) => config.beforeBuild)
+					.filter((config) => typeof config !== "undefined"),
+				pluginBuildConfig: configs
+					.flatMap((config) => config.buildConfig)
+					.filter((config) => typeof config !== "undefined"),
+				enableLogging: props.logging ?? false,
+				disableOnLoadChaining: false,
+			});
+
+			sharedContext.builders ??= {};
+			sharedContext.builders[id] = Promise.resolve(builder);
+			current_builder = builder;
+			resolver?.resolve(builder);
+		} catch (error) {
+			resolver?.reject(error);
+			throw error;
+		} finally {
+			sharedContext.builderResolvers?.delete(id);
+		}
+	};
+
 	return [
+		...props.plugins,
 		{
 			name: current_name,
+			priority: highestPriority + 1, // Ensure this plugin runs after all registered plugins,
 			version,
-			priority: lowestPriority - 1, // Ensure this plugin runs before all plugins that have the same priority as the lowest one among the provided plugins
 			requirement: {
 				frameMasterVersion: peerDependencies["frame-master"],
 				bunVersion: ">=1.3.10",
 			},
 			async serverReady() {
-				const sharedContext = ensureBuildUnifierContext();
-				const configs = sharedContext.build_config?.[id] || [];
-				const resolver = sharedContext.builderResolvers?.get(id);
-
-				try {
-					const builder = await Builder.createBuilder({
-						afterBuilds: configs
-							.flatMap((config) => config.afterBuild)
-							.filter((config) => typeof config !== "undefined"),
-						beforeBuilds: configs
-							.flatMap((config) => config.beforeBuild)
-							.filter((config) => typeof config !== "undefined"),
-						pluginBuildConfig: configs
-							.flatMap((config) => config.buildConfig)
-							.filter((config) => typeof config !== "undefined"),
-						enableLogging: props.logging ?? false,
-						disableOnLoadChaining: false,
-					});
-
-					sharedContext.builders ??= {};
-					sharedContext.builders[id] = Promise.resolve(builder);
-					resolver?.resolve(builder);
-				} catch (error) {
-					resolver?.reject(error);
-					throw error;
-				} finally {
-					sharedContext.builderResolvers?.delete(id);
-				}
+				await initSharedContext();
+			},
+			build: {
+				async beforeBuild() {
+					await initSharedContext();
+				},
+				async afterBuild() {
+					if (isBuildMode()) {
+						await current_builder?.build();
+					}
+				},
 			},
 		},
-		...props.plugins,
 	];
 }
