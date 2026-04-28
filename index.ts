@@ -165,7 +165,7 @@ export default function buildunifier(
 	ctx.index = index + 1;
 	registerPluginsForBuilder(id, pluginNames, ctx);
 
-	const current_name = index ? `${name}_${index}` : name;
+	const current_name = `${name}_${index}`;
 
 	let current_builder: Builder | null = null;
 
@@ -223,6 +223,10 @@ export default function buildunifier(
 					await current_builder?.build();
 				},
 			},
+		},
+		{
+			name,
+			version,
 		},
 	];
 }
