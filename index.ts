@@ -169,24 +169,16 @@ export default function buildunifier(
 
 	let current_builder: Builder | null = null;
 
-	const initSharedContext = () => {
+	const initSharedContext = async () => {
 		const sharedContext = ensureBuildUnifierContext();
 		const configs = sharedContext.build_config?.[id] || [];
 		const resolver = sharedContext.builderResolvers?.get(id);
 
 		try {
-			const builder = new Builder({
-				afterBuilds: configs
-					.flatMap((config) => config.afterBuild)
-					.filter((config) => typeof config !== "undefined"),
-				beforeBuilds: configs
-					.flatMap((config) => config.beforeBuild)
-					.filter((config) => typeof config !== "undefined"),
-				pluginBuildConfig: configs
-					.flatMap((config) => config.buildConfig)
-					.filter((config) => typeof config !== "undefined"),
-				enableLogging: props.logging ?? false,
-				disableOnLoadChaining: false,
+			const builder = await Builder.createBuilder({
+				buildConfigs: configs,
+				enableLogging:
+					props.logging ?? configs.some((config) => config.enableLoging),
 			});
 
 			sharedContext.builders ??= {};
@@ -213,13 +205,13 @@ export default function buildunifier(
 			},
 			serverStart: {
 				async main() {
-					initSharedContext();
+					await initSharedContext();
 				},
 			},
 			build: {
 				async beforeBuild() {
 					if (!isBuildMode()) return;
-					initSharedContext();
+					await initSharedContext();
 					await current_builder?.build();
 				},
 			},
