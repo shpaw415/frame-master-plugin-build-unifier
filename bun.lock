@@ -8,8 +8,8 @@
         "@types/bun": "latest",
       },
       "peerDependencies": {
-        "frame-master": "^3.1.5",
-        "typescript": "^5",
+        "frame-master": "^3.1.6",
+        "typescript": "^5.9.3",
       },
     },
   },
@@ -32,7 +32,7 @@
 
     "commander": ["commander@14.0.3", "", {}, "sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw=="],
 
-    "frame-master": ["frame-master@3.1.5", "", { "dependencies": { "@shpaw415/webtoken": "^2.0.0", "@types/git": "^0.0.21", "chalk": "^5.6.2", "commander": "^14.0.3", "git": "^0.1.5", "react": "^19.2.5", "react-dom": "^19.2.5", "tar": "^7.5.13" }, "peerDependencies": { "typescript": "^6.0.3" }, "bin": { "frame-master": "bin/index.ts" } }, "sha512-AnKvyqqc/jQj0ozCPshM1ILGL3WzK20dPvtcuIjIPWfUewPLCNBS17yXYHQN8X8FqzNI+c8z/89lzLscgkrV3g=="],
+    "frame-master": ["frame-master@3.1.6", "", { "dependencies": { "@shpaw415/webtoken": "^2.0.0", "@types/git": "^0.0.21", "chalk": "^5.6.2", "commander": "^14.0.3", "git": "^0.1.5", "react": "^19.2.5", "react-dom": "^19.2.5", "tar": "^7.5.13" }, "peerDependencies": { "typescript": "^6.0.3" }, "bin": { "frame-master": "bin/index.ts" } }, "sha512-Ojd3WKWJcTHsnLYA3xDBBj1hfp1haLE0tdApX4fn8WnS8NVXvooHNZ2CvNAbsWoOUmF7WRLSdMfhZBjTdoflrg=="],
 
     "git": ["git@0.1.5", "", { "dependencies": { "mime": "1.2.9" } }, "sha512-N+bfOrXyKMU/fQtCj6D/U9MQOEN0DAA8TLHSLdUQRSWBOkeRvsjJHdrdkvcq05xO7GSDKWc3nDEGoTZ4DfCCSg=="],
 

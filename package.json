@@ -1,10 +1,10 @@
 {
 	"name": "frame-master-plugin-build-unifier",
-	"version": "0.1.6",
+	"version": "1.0.0",
 	"type": "module",
 	"main": "index.ts",
 	"peerDependencies": {
-		"frame-master": "^3.1.5",
+		"frame-master": "^3.1.6",
 		"typescript": "^5.9.3"
 	},
 	"devDependencies": {
