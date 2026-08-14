@@ -3,6 +3,7 @@ name: Publish to npm
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -20,7 +21,9 @@ jobs:
       - id: changed
         name: Check for a package version change
         run: |
-          if git diff --unified=0 "${{ github.event.before }}" "${{ github.sha }}" -- package.json | rg -q '^[+-]\s*"version":'; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "package-json=true" >> "$GITHUB_OUTPUT"
+          elif git diff --unified=0 "${{ github.event.before }}" "${{ github.sha }}" -- package.json | rg -q '^[+-]\s*"version":'; then
             echo "package-json=true" >> "$GITHUB_OUTPUT"
           else
             echo "package-json=false" >> "$GITHUB_OUTPUT"
