@@ -4,7 +4,7 @@
 	"type": "module",
 	"main": "index.ts",
 	"peerDependencies": {
-		"frame-master": "^3.1.6",
+		"frame-master": ">=3.1.6 || >=4.0.0-0",
 		"typescript": "^5.9.3"
 	},
 	"devDependencies": {
