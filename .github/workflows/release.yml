@@ -1,21 +1,41 @@
 name: Publish to npm
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
-  publish:
+  version-change:
     runs-on: ubuntu-latest
-    environment: npm
+    outputs:
+      package-json: ${{ steps.changed.outputs.package-json }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+
+      - id: changed
+        name: Check for a package version change
+        run: |
+          if git diff --unified=0 "${{ github.event.before }}" "${{ github.sha }}" -- package.json | rg -q '^[+-]\s*"version":'; then
+            echo "package-json=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "package-json=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    needs: version-change
+    if: needs.version-change.outputs.package-json == 'true'
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -27,9 +47,6 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - run: bun install --frozen-lockfile
-
-      - name: Verify release version
-        run: test "v$(bun pm pkg get version | tr -d '\"')" = "${{ github.event.release.tag_name }}"
 
       - name: Test package
         run: bun test
