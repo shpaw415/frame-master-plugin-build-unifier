@@ -1,18 +1,20 @@
 {
 	"name": "frame-master-plugin-build-unifier",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"type": "module",
 	"main": "index.ts",
 	"peerDependencies": {
-		"frame-master": ">=3.1.6 || >=4.0.0-0",
+		"frame-master": ">=3.1.6 <4.0.0 || ^4.0.0-0 || ^4.0.0",
 		"typescript": "^5.9.3"
 	},
 	"devDependencies": {
-		"@types/bun": "latest"
+		"@types/bun": "latest",
+		"frame-master": "4.0.0-beta.1"
 	},
 	"scripts": {
 		"dev": "NODE_ENV=development frame-master dev",
 		"start": "NODE_ENV=production bun frame-master start",
-		"build:dev": "NODE_ENV=development bun frame-master build"
+		"build:dev": "NODE_ENV=development bun frame-master build",
+		"test": "bun test"
 	}
 }

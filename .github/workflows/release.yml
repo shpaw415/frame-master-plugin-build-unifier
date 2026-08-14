@@ -1,4 +1,4 @@
-name: Release
+name: Publish to npm
 
 on:
   release:
@@ -24,11 +24,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          registry-url: https://registry.npmjs.org
 
       - run: bun install --frozen-lockfile
 
       - name: Verify release version
         run: test "v$(bun pm pkg get version | tr -d '\"')" = "${{ github.event.release.tag_name }}"
 
-      - name: Publish to npm
-        run: npx npm@^11.5.1 publish --provenance
+      - name: Test package
+        run: bun test
+
+      - name: Publish with npm trusted publishing
+        run: npx --yes npm@^11.5.1 publish --provenance --access public

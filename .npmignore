@@ -6,3 +6,6 @@ CONFIG_EXEMPLE.md
 QUICK_EXEMPLE.md
 .env
 tests
+test
+.github
+tsconfig.json

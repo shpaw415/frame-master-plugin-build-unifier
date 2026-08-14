@@ -1,6 +1,8 @@
 import { Builder } from "frame-master/build";
+import { getConfig } from "frame-master/config";
 import {
 	getGlobalPluginContext,
+	pluginLoader,
 	setGlobalPluginContext,
 } from "frame-master/plugin";
 import type {
@@ -173,12 +175,26 @@ export default function buildunifier(
 		const sharedContext = ensureBuildUnifierContext();
 		const configs = sharedContext.build_config?.[id] || [];
 		const resolver = sharedContext.builderResolvers?.get(id);
+		const config = getConfig();
+		const virtualModulePlugin = (
+			pluginLoader as
+				| {
+						getVirtualModuleRegistry?: () => {
+							createPlugin: () => Bun.BunPlugin | null;
+						};
+					}
+				| null
+		)?.getVirtualModuleRegistry?.().createPlugin();
 
 		try {
 			const builder = await Builder.createBuilder({
 				buildConfigs: configs,
 				enableLogging:
 					props.logging ?? configs.some((config) => config.enableLoging),
+				baseEntrypoints: config?.pluginsOptions?.entrypoints,
+				disableOnLoadChaining:
+					config?.pluginsOptions?.disableOnLoadChaining,
+				virtualModulePlugin,
 			});
 
 			sharedContext.builders ??= {};
